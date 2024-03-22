@@ -4,6 +4,7 @@ from sklearn.neighbors import kneighbors_graph
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import rbf_kernel
+from plotters import *
 
 
 class NormalizedCut:
@@ -34,18 +35,6 @@ class NormalizedCut:
         Y = U / np.linalg.norm(U, axis=1, keepdims=True)
         labels = KMeans(n_clusters=self.k).fit_predict(Y)
         return labels
-
-
-def plot_clusters(X, labels, title):
-    plt.figure(figsize=(8, 6))
-
-    for label in np.unique(labels):
-        indices = labels == label
-        plt.scatter(X[indices, 0], X[indices, 1], label=f'Cluster {label + 1}')
-
-    plt.title(title)
-    plt.legend()
-    plt.show()
 
 
 if __name__ == "__main__":
