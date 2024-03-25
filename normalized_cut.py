@@ -3,19 +3,35 @@ import numpy as np
 from sklearn.neighbors import kneighbors_graph
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-from sklearn.metrics.pairwise import rbf_kernel
+from sklearn.metrics.pairwise import rbf_kernel, polynomial_kernel, sigmoid_kernel, linear_kernel
 from plotters import *
 
 
 class NormalizedCut:
 
-    def __init__(self, k=3, gamma=1):
+    def __init__(self, k=3, gamma=1, coef0=1, degree=3, kernel='rbf'):
         self.k = k
         self.gamma = gamma
+        self.coef0 = coef0
+        self.degree = degree
         self.threshold = 1e-6
+        self.kernel = kernel
 
-    def _compute_eigenvalues_and_eigenvectors(matrix):
-        return np.linalg.eig(La)
+    def _compute_kernel_matrix(self, X):
+        match self.kernel:
+            case 'rbf':
+                return rbf_kernel(X, gamma=self.gamma)
+            case 'polynomial':
+                return polynomial_kernel(X, degree=self.degree, coef0=self.coef0)
+            case 'sigmoid':
+                return sigmoid_kernel(X, gamma=self.gamma, coef0=self.coef0)
+            case 'linear':
+                return linear_kernel(X)
+            case _:
+                raise ValueError("Unsupported kernel type. Supported types: 'rbf', 'polynomial', 'sigmoid', 'linear'.")
+
+    def _compute_eigenvalues_and_eigenvectors(self, matrix):
+        return np.linalg.eig(matrix)
 
     def _sort_eigenvalues_and_eigenvectors(self, eigenvalues, eigenvectors):
         idx = eigenvalues.argsort()[::]
@@ -24,7 +40,7 @@ class NormalizedCut:
         return eigenvalues, eigenvectors
 
     def fit_predict(self, X):
-        A = rbf_kernel(X, gamma=self.gamma)
+        A = self._compute_kernel_matrix(X)
         A = np.where(A < self.threshold, 0, A)
         D = np.diag(np.sum(A, axis=1))
         L = D - A
@@ -65,7 +81,7 @@ if __name__ == "__main__":
         [8, 2]
     ])
 
-    normalized_cut = NormalizedCut(3, 1)
+    normalized_cut = NormalizedCut(kernel='linear')
     labels = normalized_cut.fit_predict(data_matrix)
     plot_clusters(data_matrix, labels, "Clustering")
     print(labels)
