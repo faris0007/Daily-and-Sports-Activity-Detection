@@ -13,10 +13,6 @@ class NormalizedCut:
         self.k = k
         self.gamma = gamma
         self.threshold = 1e-6
-
-    def _compute_eigenvalues_and_eigenvectors(matrix):
-        return np.linalg.eig(La)
-
     def _sort_eigenvalues_and_eigenvectors(self, eigenvalues, eigenvectors):
         idx = eigenvalues.argsort()[::]
         eigenvalues = eigenvalues[idx]
@@ -32,7 +28,10 @@ class NormalizedCut:
         eigenvalues, eigenvectors = np.linalg.eig(La)
         eigenvalues, eigenvectors = self._sort_eigenvalues_and_eigenvectors(eigenvalues, eigenvectors)
         U = eigenvectors[:, :self.k]
-        Y = U / np.linalg.norm(U, axis=1, keepdims=True)
+        N = np.linalg.norm(U, axis=1, keepdims=True)
+        N[N == 0] = 1e-6  # Replace zeros in N with a very small value
+        U_real = np.real(U)  # Extract real part of U
+        Y = U_real / N
         labels = KMeans(n_clusters=self.k).fit_predict(Y)
         return labels
 
