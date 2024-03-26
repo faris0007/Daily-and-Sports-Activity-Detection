@@ -50,7 +50,7 @@ class KMeans:
 
 
 if __name__ == '__main__':
-    # data, _, data_labels, _ = get_data_for_solution_one()
+    data, _, data_labels, _ = get_data_for_solution_one()
     # data = np.array([
     #     [5, 8],
     #     [10, 8],
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     #     [8, 2]
     # ])
     # data_labels=np.array([0,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2 ])
-    kmeans = KMeans(k=3)
+    kmeans = KMeans(k=19)
     labels, _ = kmeans.fit_predict(data)
     plot_clusters(data, labels, 'Clusters')
     print(labels)

@@ -41,13 +41,14 @@ class Evaluation:
 
     def _compute_recall(self):
         total_recall = 0
-        total_len = self.labels.shape[0]
         unique_labels, counts = np.unique(self.labels, return_counts=True)
         for cluster in self.clusters:
             labels_in_cluster = self.labels[self.clusters[cluster]]
             unique_labels_in_cluster, counts_in_cluster = np.unique(labels_in_cluster, return_counts=True)
             max_count = np.argmax(counts_in_cluster)
-            temp = counts_in_cluster[max_count] / counts[unique_labels[unique_labels_in_cluster[max_count]]]
+            max_label=unique_labels_in_cluster[max_count]
+            total_count=counts[np.where(unique_labels == max_label)[0][0]]
+            temp = counts_in_cluster[max_count] / total_count
             total_recall += temp
         return total_recall
 
@@ -59,7 +60,9 @@ class Evaluation:
             unique_labels, counts = np.unique(labels_in_cluster, return_counts=True)
             max_count = np.max(counts)
             precision = max_count / len(self.clusters[cluster])
-            recall = max_count / counts_total[unique_labels[np.argmax(counts)]]
+            max_label=unique_labels[np.argmax(counts)]
+            total_count = counts_total[np.where(unique_labels_total == max_label)[0][0]]
+            recall = max_count / total_count
             result += 2 * precision * recall / (precision + recall)
         result /= len(self.clusters)
         return result
