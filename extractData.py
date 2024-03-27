@@ -87,9 +87,5 @@ def get_data_for_solution_two():
 
 
 
-if __name__ == '__main__':
-    get_data_for_solution_one()
-    get_data_for_solution_two()
-
 
 
