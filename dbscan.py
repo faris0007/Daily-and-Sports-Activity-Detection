@@ -1,8 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from plotters import *
-from sklearn.cluster import DBSCAN as DBSCANB
+from extractData import *
+from evaluation import *
 
+import numpy as np
+from sklearn.cluster import DBSCAN as DBSCANB
 
 class DBSCAN:
     def __init__(self, epsilon, minpts):
@@ -48,39 +48,15 @@ class DBSCAN:
 
 
 if __name__ == "__main__":
-    X = np.array([
-        [5, 8],
-        [10, 8],
-        [11, 8],
-        [6, 7],
-        [10, 7],
-        [12, 7],
-        [13, 7],
-        [5, 6],
-        [10, 6],
-        [13, 6],
-        [14, 6],
-        [6, 5],
-        [11, 5],
-        [15, 5],
-        [2, 4],
-        [3, 4],
-        [5, 4],
-        [6, 4],
-        [7, 4],
-        [9, 4],
-        [15, 4],
-        [3, 3],
-        [7, 3],
-        [8, 2]
-    ])
+    training_data,test_data,training_label,test_label = get_data_for_solution_one()
 
     dbscan = DBSCAN(epsilon=1, minpts=2)
-    labels = dbscan.fit_predict(X)
-    plot_clusters(X, labels, "Clustering")
-    print(labels)
-
+    labels = dbscan.fit_predict(training_data)
+    evaluation = Evaluation(labels, training_label)
+    evaluation.calculate_metrics(training_label, labels)
+    evaluation.evaluate()
     dbscan_builtin = DBSCANB(eps=1, min_samples=2)
-    dbscan_builtin.fit(X)
+    dbscan_builtin.fit(training_data)
     labels = dbscan_builtin.labels_
-    print(labels)
+    evaluation = Evaluation(labels, training_label)
+    evaluation.evaluate()
