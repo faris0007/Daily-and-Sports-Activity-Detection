@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 from plotters import *
 from extractData import get_data_for_solution_one
 from evaluation import Evaluation
+from extractData import get_data_for_solution_two
+
+
+
+
 class KMeans:
     def __init__(self, k, n_times=5, max_iterations=100, ep=1e-6):
         self.k = k
@@ -18,16 +23,11 @@ class KMeans:
         centroids = data[centroids_indices]
 
         for _ in range(self.max_iterations):
-            clusters = [[] for _ in range(self.k)]
-            for point in data:
-                distances = [self._euclidean_distance(point, centroid) for centroid in centroids]
-                nearest_centroid_index = np.argmin(distances)
-                clusters[nearest_centroid_index].append(point)
-            new_centroids = np.array([np.mean(cluster, axis=0) for cluster in clusters])
-            if np.sum(np.abs(centroids - new_centroids)) < self.ep:
+            clusters = np.argmin(np.linalg.norm(data[:, None] - centroids, axis=2), axis=1)
+            new_centroids = np.array([np.mean(data[clusters == i], axis=0) for i in range(self.k)])
+            if np.all(np.abs(new_centroids - centroids) < self.ep):
                 break
             centroids = new_centroids
-
         return clusters, centroids
 
     def fit_predict(self, data):
@@ -36,21 +36,17 @@ class KMeans:
         for _ in range(self.n_times):
             clusters, centroids = self._k_means_algorithm(data)
             within_cluster_score = 0
-            for cluster, centroid in zip(clusters, centroids):
-                within_cluster_score += np.sum([self._euclidean_distance(point, centroid) for point in cluster])
+            for i in range(self.k):
+                within_cluster_score += np.sum((data[clusters == i] - centroids[i]) ** 2)
             if within_cluster_score < best_score:
                 best_score = within_cluster_score
                 best_clusters, best_centroids = clusters, centroids
 
-        labels = np.zeros(len(data))
-        for i, cluster in enumerate(best_clusters):
-            labels[[data.tolist().index(point.tolist()) for point in cluster]] = i
-
-        return labels, best_centroids
+        return best_clusters, best_centroids
 
 
 if __name__ == '__main__':
-    data, _, data_labels, _ = get_data_for_solution_one()
+    data, _, data_labels, _ = get_data_for_solution_two()
     # data = np.array([
     #     [5, 8],
     #     [10, 8],
@@ -84,4 +80,3 @@ if __name__ == '__main__':
     print(labels)
     evaluation = Evaluation(labels, data_labels)
     evaluation.evaluate()
-

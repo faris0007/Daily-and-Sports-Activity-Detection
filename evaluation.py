@@ -46,11 +46,11 @@ class Evaluation:
             labels_in_cluster = self.labels[self.clusters[cluster]]
             unique_labels_in_cluster, counts_in_cluster = np.unique(labels_in_cluster, return_counts=True)
             max_count = np.argmax(counts_in_cluster)
-            max_label=unique_labels_in_cluster[max_count]
-            total_count=counts[np.where(unique_labels == max_label)[0][0]]
+            max_label =unique_labels_in_cluster[max_count]
+            total_count =counts[np.where(unique_labels == max_label)[0][0]]
             temp = counts_in_cluster[max_count] / total_count
             total_recall += temp
-        return total_recall
+        return total_recall/len(self.clusters)
 
     def _compute_f1_score(self):
         result = 0
